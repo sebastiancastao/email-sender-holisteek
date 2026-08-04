@@ -139,7 +139,7 @@ function pageOne(s: SectionMap): string {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="padding:26px 26px 0;font-family:'Poppins',Arial,sans-serif;font-weight:500;font-size:36px;color:#ffffff;">
-                  Articulo
+                  ${text("p1-hero", "title", s, "Articulo")}
                 </td>
               </tr>
               <tr>
@@ -150,12 +150,12 @@ function pageOne(s: SectionMap): string {
                   <table role="presentation" width="330" cellpadding="0" cellspacing="0" border="0" class="hero-copy" style="max-width:330px;">
                     <tr>
                       <td style="font-family:'Nunito Sans',Arial,sans-serif;font-size:15px;line-height:1.45;color:#ffffff;padding-bottom:16px;">
-                        Stretching scientific facts that yougis kne before times. Learn more about your body anatomy and the love language of bones
+                        ${text("p1-hero", "description", s, "Stretching scientific facts that yougis kne before times. Learn more about your body anatomy and the love language of bones")}
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        <a href="${link("p1-hero", s)}" class="pill pill-w">Read Article</a>
+                        <a href="${link("p1-hero", s)}" class="pill pill-w">${text("p1-hero", "cta", s, "Read Article")}</a>
                       </td>
                     </tr>
                   </table>
@@ -182,11 +182,11 @@ function pageOne(s: SectionMap): string {
             <div class="prod-title" style="color:#dc3b31;">${text("p1-product-1", "title", s, "Feeling sluggish?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td valign="top">
-                <div class="prod-body">Dr Vit - Vit C<br>benefits:</div>
+                <div class="prod-body">${text("p1-product-1", "subtitle", s, "Dr Vit - Vit C")}<br>benefits:</div>
                 <ul class="prod-list">
-                  <li>better immune system</li><li>Boosts energy</li><li>better skin</li>
+                  <li>${text("p1-product-1", "bullet1", s, "better immune system")}</li><li>${text("p1-product-1", "bullet2", s, "Boosts energy")}</li><li>${text("p1-product-1", "bullet3", s, "better skin")}</li>
                 </ul>
-                <a href="${link("p1-product-1", s)}" class="pill pill-sm">Try it out</a>
+                <a href="${link("p1-product-1", s)}" class="pill pill-sm">${text("p1-product-1", "cta", s, "Try it out")}</a>
               </td>
               <td width="90" valign="top" align="right">
                 <img src="${img("p1-product-1", s)}" width="90" alt="Vit C" style="display:block;width:90px;max-width:90px;height:auto;">
@@ -197,11 +197,11 @@ function pageOne(s: SectionMap): string {
             <div class="prod-title" style="color:#2f5099;">${text("p1-product-2", "title", s, "Want tigher skin?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td valign="top">
-                <div class="prod-body">LED Mask by Pop<br>benefits:</div>
+                <div class="prod-body">${text("p1-product-2", "subtitle", s, "LED Mask by Pop")}<br>benefits:</div>
                 <ul class="prod-list">
-                  <li>Anti Wrinkle</li><li>Boosts energy</li><li>better skin</li>
+                  <li>${text("p1-product-2", "bullet1", s, "Anti Wrinkle")}</li><li>${text("p1-product-2", "bullet2", s, "Boosts energy")}</li><li>${text("p1-product-2", "bullet3", s, "better skin")}</li>
                 </ul>
-                <a href="${link("p1-product-2", s)}" class="pill pill-sm">Try it out</a>
+                <a href="${link("p1-product-2", s)}" class="pill pill-sm">${text("p1-product-2", "cta", s, "Try it out")}</a>
               </td>
               <td width="80" valign="top" align="right">
                 <img src="${img("p1-product-2", s)}" width="80" alt="LED Mask" style="display:block;width:80px;max-width:80px;height:auto;">
@@ -217,11 +217,11 @@ function pageOne(s: SectionMap): string {
                 <img src="${img("p1-product-3", s)}" width="90" alt="Organic mat" style="display:block;width:90px;max-width:90px;height:auto;">
               </td>
               <td valign="top" style="padding-left:12px;">
-                <div class="prod-body">Try Organic MATTY</div>
+                <div class="prod-body">${text("p1-product-3", "subtitle", s, "Try Organic MATTY")}</div>
                 <ul class="prod-list">
-                  <li>Natural</li><li>Grab is good</li><li>Durabilty</li>
+                  <li>${text("p1-product-3", "bullet1", s, "Natural")}</li><li>${text("p1-product-3", "bullet2", s, "Grab is good")}</li><li>${text("p1-product-3", "bullet3", s, "Durabilty")}</li>
                 </ul>
-                <a href="${link("p1-product-3", s)}" class="pill pill-sm">Try it out</a>
+                <a href="${link("p1-product-3", s)}" class="pill pill-sm">${text("p1-product-3", "cta", s, "Try it out")}</a>
               </td>
             </tr></table>
           </td>
@@ -232,11 +232,11 @@ function pageOne(s: SectionMap): string {
                 <img src="${img("p1-product-4", s)}" width="90" alt="Organic mat" style="display:block;width:90px;max-width:90px;height:auto;">
               </td>
               <td valign="top" style="padding-left:12px;">
-                <div class="prod-body">Try Organic MATTY</div>
+                <div class="prod-body">${text("p1-product-4", "subtitle", s, "Try Organic MATTY")}</div>
                 <ul class="prod-list">
-                  <li>Natural</li><li>Grab is good</li><li>Durabilty</li>
+                  <li>${text("p1-product-4", "bullet1", s, "Natural")}</li><li>${text("p1-product-4", "bullet2", s, "Grab is good")}</li><li>${text("p1-product-4", "bullet3", s, "Durabilty")}</li>
                 </ul>
-                <a href="${link("p1-product-4", s)}" class="pill pill-sm">Try it out</a>
+                <a href="${link("p1-product-4", s)}" class="pill pill-sm">${text("p1-product-4", "cta", s, "Try it out")}</a>
               </td>
             </tr></table>
           </td>
@@ -258,7 +258,7 @@ function pageOne(s: SectionMap): string {
             </td>
           </tr></table>
           <div style="margin-top:22px;">
-            <a href="${link("p1-asana", s)}" class="pill">Discover More</a>
+            <a href="${link("p1-asana", s)}" class="pill">${text("p1-asana", "cta", s, "Discover More")}</a>
           </div>
         </td></tr>
       </table>
@@ -329,7 +329,7 @@ function pageTwo(s: SectionMap): string {
       </table>
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px auto 0;"><tr>
         <td style="background-color:#1c2431;border-radius:40px;">
-          <a href="${link("p2-explore", s)}" style="display:block;width:200px;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:20px;padding:14px;">Explore More</a>
+          <a href="${link("p2-explore", s)}" style="display:block;width:200px;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:20px;padding:14px;">${text("p2-explore", "cta", s, "Explore More")}</a>
         </td>
       </tr></table>
     </td>
@@ -395,7 +395,7 @@ function pageThree(s: SectionMap): string {
 
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;"><tr>
         <td bgcolor="#1c2431" style="background-color:#1c2431;border-radius:40px;">
-          <a href="${link("p3-partner", s)}" style="display:block;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:19px;padding:18px;">Explore</a>
+          <a href="${link("p3-partner", s)}" style="display:block;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:19px;padding:18px;">${text("p3-partner", "cta", s, "Explore")}</a>
         </td>
       </tr></table>
 

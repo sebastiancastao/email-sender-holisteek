@@ -15,7 +15,12 @@ export type TextFieldKey =
   | "category"
   | "day"
   | "dow"
-  | "sub";
+  | "sub"
+  | "subtitle"
+  | "bullet1"
+  | "bullet2"
+  | "bullet3"
+  | "cta";
 
 // Nombre de columna en `newsletter_sections` para cada campo de texto.
 export const TEXT_FIELD_COLUMNS: Record<TextFieldKey, string> = {
@@ -27,6 +32,11 @@ export const TEXT_FIELD_COLUMNS: Record<TextFieldKey, string> = {
   day: "day",
   dow: "dow",
   sub: "sub",
+  subtitle: "subtitle",
+  bullet1: "bullet1",
+  bullet2: "bullet2",
+  bullet3: "bullet3",
+  cta: "cta",
 };
 
 export const TEXT_FIELD_KEYS = Object.keys(TEXT_FIELD_COLUMNS) as TextFieldKey[];
@@ -71,6 +81,18 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/hero.jpg`,
     defaultLinkUrl: "#",
+    autofillFrom: "article",
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Articulo" },
+      {
+        key: "description",
+        label: "Descripción",
+        multiline: true,
+        defaultValue:
+          "Stretching scientific facts that yougis kne before times. Learn more about your body anatomy and the love language of bones",
+      },
+      { key: "cta", label: "Texto del botón", defaultValue: "Read Article" },
+    ],
   },
   {
     id: "p1-product-1",
@@ -79,7 +101,14 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/vitamins.png`,
     defaultLinkUrl: "#",
-    textFields: [{ key: "title", label: "Título", defaultValue: "Feeling sluggish?" }],
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Feeling sluggish?" },
+      { key: "subtitle", label: "Nombre del producto", defaultValue: "Dr Vit - Vit C" },
+      { key: "bullet1", label: "Bullet 1", defaultValue: "better immune system" },
+      { key: "bullet2", label: "Bullet 2", defaultValue: "Boosts energy" },
+      { key: "bullet3", label: "Bullet 3", defaultValue: "better skin" },
+      { key: "cta", label: "Texto del botón", defaultValue: "Try it out" },
+    ],
   },
   {
     id: "p1-product-2",
@@ -88,7 +117,14 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/ledmask.png`,
     defaultLinkUrl: "#",
-    textFields: [{ key: "title", label: "Título", defaultValue: "Want tigher skin?" }],
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Want tigher skin?" },
+      { key: "subtitle", label: "Nombre del producto", defaultValue: "LED Mask by Pop" },
+      { key: "bullet1", label: "Bullet 1", defaultValue: "Anti Wrinkle" },
+      { key: "bullet2", label: "Bullet 2", defaultValue: "Boosts energy" },
+      { key: "bullet3", label: "Bullet 3", defaultValue: "better skin" },
+      { key: "cta", label: "Texto del botón", defaultValue: "Try it out" },
+    ],
   },
   {
     id: "p1-product-3",
@@ -97,7 +133,14 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
-    textFields: [{ key: "title", label: "Título", defaultValue: "Switching to organic?" }],
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Switching to organic?" },
+      { key: "subtitle", label: "Nombre del producto", defaultValue: "Try Organic MATTY" },
+      { key: "bullet1", label: "Bullet 1", defaultValue: "Natural" },
+      { key: "bullet2", label: "Bullet 2", defaultValue: "Grab is good" },
+      { key: "bullet3", label: "Bullet 3", defaultValue: "Durabilty" },
+      { key: "cta", label: "Texto del botón", defaultValue: "Try it out" },
+    ],
   },
   {
     id: "p1-product-4",
@@ -106,7 +149,14 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
-    textFields: [{ key: "title", label: "Título", defaultValue: "Switching to organic?" }],
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Switching to organic?" },
+      { key: "subtitle", label: "Nombre del producto", defaultValue: "Try Organic MATTY" },
+      { key: "bullet1", label: "Bullet 1", defaultValue: "Natural" },
+      { key: "bullet2", label: "Bullet 2", defaultValue: "Grab is good" },
+      { key: "bullet3", label: "Bullet 3", defaultValue: "Durabilty" },
+      { key: "cta", label: "Texto del botón", defaultValue: "Try it out" },
+    ],
   },
   {
     id: "p1-asana",
@@ -124,6 +174,7 @@ export const SECTION_DEFS: SectionDef[] = [
         defaultValue:
           'Āsana (Sanskrit: आसन) means "seat" or "posture." Traditionally, it referred to a stable, comfortable position for meditation. In modern yoga, the term includes the physical postures practiced to develop strength, flexibility, and body awareness.',
       },
+      { key: "cta", label: "Texto del botón", defaultValue: "Discover More" },
     ],
   },
 
@@ -201,6 +252,7 @@ export const SECTION_DEFS: SectionDef[] = [
     label: 'Página 2 — Botón "Explore More"',
     kind: "link",
     defaultLinkUrl: "#",
+    textFields: [{ key: "cta", label: "Texto del botón", defaultValue: "Explore More" }],
   },
 
   // ---------- Página 3 ----------
@@ -222,6 +274,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { key: "bestFor", label: "Best for", defaultValue: "Sound healing" },
       { key: "location", label: "Ubicación", defaultValue: "Madrid Spain" },
       { key: "category", label: "Categoría (What?)", defaultValue: "Wellness Resort" },
+      { key: "cta", label: "Texto del botón", defaultValue: "Explore" },
     ],
   },
   {
