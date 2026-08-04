@@ -48,9 +48,10 @@ export interface SectionDef {
   textFields?: TextFieldDef[];
   // Si está presente, la sección muestra un campo para pegar una URL de
   // holisteek.com y autocompletar sus datos desde ahí:
-  //  - "place"  -> holisteek.com/places/...      (/api/newsletter/places/autofill)
-  //  - "event"  -> holisteek.com/experiences/...  (/api/newsletter/events/autofill)
-  autofillFrom?: "place" | "event";
+  //  - "place"   -> holisteek.com/places/...      (/api/newsletter/places/autofill)
+  //  - "event"   -> holisteek.com/experiences/...  (/api/newsletter/events/autofill)
+  //  - "article" -> holisteek.com/guide/...        (/api/newsletter/articles/autofill)
+  autofillFrom?: "place" | "event" | "article";
 }
 
 // Bucket original donde vivían las imágenes de ejemplo. Se usa solo como
@@ -149,6 +150,16 @@ export const SECTION_DEFS: SectionDef[] = [
     label: "Página 2 — Tarjeta de artículo 1",
     kind: "image+link",
     defaultLinkUrl: "#",
+    autofillFrom: "article",
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Abstract" },
+      {
+        key: "description",
+        label: "Descripción",
+        multiline: true,
+        defaultValue: "This dissertation reports a study gree-of-freedom systems with pa urces of energy dissipatio",
+      },
+    ],
   },
   {
     id: "p2-article-2",
@@ -156,6 +167,16 @@ export const SECTION_DEFS: SectionDef[] = [
     label: "Página 2 — Tarjeta de artículo 2",
     kind: "image+link",
     defaultLinkUrl: "#",
+    autofillFrom: "article",
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Abstract" },
+      {
+        key: "description",
+        label: "Descripción",
+        multiline: true,
+        defaultValue: "This dissertation reports a study gree-of-freedom systems with pa urces of energy dissipatio",
+      },
+    ],
   },
   {
     id: "p2-article-3",
@@ -163,6 +184,16 @@ export const SECTION_DEFS: SectionDef[] = [
     label: "Página 2 — Tarjeta de artículo 3",
     kind: "image+link",
     defaultLinkUrl: "#",
+    autofillFrom: "article",
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Abstract" },
+      {
+        key: "description",
+        label: "Descripción",
+        multiline: true,
+        defaultValue: "This dissertation reports a study gree-of-freedom systems with pa urces of energy dissipatio",
+      },
+    ],
   },
   {
     id: "p2-explore",

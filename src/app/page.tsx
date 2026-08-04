@@ -40,7 +40,7 @@ function pageDisplayName(page: number | "all") {
 }
 
 const AUTOFILL_CONFIG: Record<
-  "place" | "event",
+  "place" | "event" | "article",
   {
     endpoint: string;
     placeholder: string;
@@ -61,6 +61,18 @@ const AUTOFILL_CONFIG: Record<
     helpText: "Trae fecha, nombre y lugar automáticamente.",
     buildBody: (sectionId, url) => ({ sectionId, url }),
   },
+  article: {
+    endpoint: "/api/newsletter/articles/autofill",
+    placeholder: "https://www.holisteek.com/guide/...",
+    helpText: "Trae imagen, título y descripción automáticamente.",
+    buildBody: (sectionId, url) => ({ sectionId, url }),
+  },
+};
+
+const AUTOFILL_SOURCE_LABEL: Record<"place" | "event" | "article", string> = {
+  place: "holisteek.com/places",
+  event: "holisteek.com/experiences",
+  article: "holisteek.com/guide",
 };
 
 // A partir de una fila de `newsletter_sections` (image_url, link_url, title,
@@ -308,7 +320,7 @@ function SectionRow({
         {section.autofillFrom && (
           <div className="mt-2 flex flex-col gap-1.5 rounded-lg border border-dashed border-black/[.15] p-3 dark:border-white/[.2]">
             <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              Autocompletar desde {section.autofillFrom === "place" ? "holisteek.com/places" : "holisteek.com/experiences"}
+              Autocompletar desde {AUTOFILL_SOURCE_LABEL[section.autofillFrom]}
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input

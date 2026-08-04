@@ -275,9 +275,9 @@ function pageTwo(s: SectionMap): string {
       : "";
     return `<a href="${link(id, s)}" style="display:block;text-decoration:none;color:inherit;background-color:#fdfdfb;border-radius:12px;padding:18px 14px;">
               ${thumb}
-              <div class="art-ab">Abstract</div>
+              <div class="art-ab">${text(id, "title", s, "Abstract")}</div>
               <div class="art-label">ARTICLE</div>
-              <div class="art-frag">This dissertation reports a study gree-of-freedom systems with pa urces of energy dissipatio</div>
+              <div class="art-frag">${text(id, "description", s, "This dissertation reports a study gree-of-freedom systems with pa urces of energy dissipatio")}</div>
             </a>`;
   };
 
