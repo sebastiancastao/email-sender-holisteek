@@ -26,5 +26,4 @@ export function getSupabaseAdmin(): SupabaseClient {
 }
 
 export const NEWSLETTER_TABLE = "newsletter_sections";
-export const NEWSLETTER_MEDIA_TABLE = "newsletter_media";
 export const NEWSLETTER_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "newsletter";

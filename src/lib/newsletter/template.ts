@@ -1,4 +1,4 @@
-import { PageNumber, SectionMap } from "./sections";
+import { LOGO_URL, PageNumber, SectionMap, TextFieldKey } from "./sections";
 
 // Plantilla del newsletter Holisteek, generada dinámicamente a partir de
 // `SectionMap` (imagen + URL de cada sección, cargadas desde Supabase).
@@ -25,7 +25,7 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;");
 }
 
-function text(id: string, field: "title" | "description", s: SectionMap, fallback = ""): string {
+function text(id: string, field: TextFieldKey, s: SectionMap, fallback = ""): string {
   const raw = s[id]?.[field] || fallback;
   return escapeHtml(raw).replace(/\n/g, "<br>");
 }
@@ -123,7 +123,7 @@ function pageOne(s: SectionMap): string {
   <!-- header -->
   <tr>
     <td align="center" style="background-color:#ecf1c2;padding:20px 0 14px;">
-      <img src="${img("p1-logo", s)}" width="209" alt="Holisteek" style="display:block;width:209px;height:auto;">
+      <img src="${escapeAttr(LOGO_URL)}" width="209" alt="Holisteek" style="display:block;width:209px;height:auto;">
     </td>
   </tr>
 
@@ -179,7 +179,7 @@ function pageOne(s: SectionMap): string {
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td class="stack" width="50%" valign="top" style="padding:0 13px 34px 0;">
-            <div class="prod-title" style="color:#dc3b31;">Feeling sluggish?</div>
+            <div class="prod-title" style="color:#dc3b31;">${text("p1-product-1", "title", s, "Feeling sluggish?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td valign="top">
                 <div class="prod-body">Dr Vit - Vit C<br>benefits:</div>
@@ -194,7 +194,7 @@ function pageOne(s: SectionMap): string {
             </tr></table>
           </td>
           <td class="stack" width="50%" valign="top" style="padding:0 0 34px 13px;">
-            <div class="prod-title" style="color:#2f5099;">Want tigher skin?</div>
+            <div class="prod-title" style="color:#2f5099;">${text("p1-product-2", "title", s, "Want tigher skin?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td valign="top">
                 <div class="prod-body">LED Mask by Pop<br>benefits:</div>
@@ -211,7 +211,7 @@ function pageOne(s: SectionMap): string {
         </tr>
         <tr>
           <td class="stack" width="50%" valign="top" style="padding:0 13px 0 0;">
-            <div align="center" class="prod-title" style="color:#efa0c0;">Switching to organic?</div>
+            <div align="center" class="prod-title" style="color:#efa0c0;">${text("p1-product-3", "title", s, "Switching to organic?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td width="90" valign="top">
                 <img src="${img("p1-product-3", s)}" width="90" alt="Organic mat" style="display:block;width:90px;max-width:90px;height:auto;">
@@ -226,7 +226,7 @@ function pageOne(s: SectionMap): string {
             </tr></table>
           </td>
           <td class="stack" width="50%" valign="top" style="padding:0 0 0 13px;">
-            <div align="center" class="prod-title" style="color:#efa0c0;">Switching to organic?</div>
+            <div align="center" class="prod-title" style="color:#efa0c0;">${text("p1-product-4", "title", s, "Switching to organic?")}</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
               <td width="90" valign="top">
                 <img src="${img("p1-product-4", s)}" width="90" alt="Organic mat" style="display:block;width:90px;max-width:90px;height:auto;">
@@ -288,19 +288,20 @@ function pageTwo(s: SectionMap): string {
 
   <tr>
     <td align="center" style="background-color:#ecf1c2;padding:22px 0;">
-      <img src="${img("p2-logo", s)}" width="270" alt="Holisteek" style="display:block;width:270px;height:auto;">
+      <img src="${escapeAttr(LOGO_URL)}" width="270" alt="Holisteek" style="display:block;width:270px;height:auto;">
     </td>
   </tr>
 
   <tr>
     <td style="background-color:#faf9f3;padding:34px 32px 60px;">
-      <div style="font-family:'Poppins',Arial,sans-serif;font-weight:500;font-size:22px;color:#232323;margin-bottom:26px;">Get Inspired</div>
+      <div style="font-family:'Poppins',Arial,sans-serif;font-weight:500;font-size:22px;color:#232323;margin-bottom:26px;">${text("p2-get-inspired", "title", s, "Get Inspired")}</div>
       <p style="margin:0;font-family:'Poppins',Arial,sans-serif;font-weight:400;font-size:22px;line-height:1.55;color:#1f1f1f;">
-        "Embrace the dance of life with grace, as each breath is a step towards your true self. In the stillness of the mind, the universe reveals its secrets, guiding you with the wisdom of the Yoga Sutras.
-        <br><br>
-        Let your heart be the compass, your spirit the light, and your practice the path. Together, they lead you to the serene shores of inner peace and boundless love.
-        <br><br>
-        Remember, you are not just a wave in the ocean; you are the ocean in a wave, connected to all, infinite and whole. Trust the journey, for it is in the journey that the soul finds its purpose and the mind its tranquility."
+        ${text(
+          "p2-get-inspired",
+          "description",
+          s,
+          '"Embrace the dance of life with grace, as each breath is a step towards your true self. In the stillness of the mind, the universe reveals its secrets, guiding you with the wisdom of the Yoga Sutras.\n\nLet your heart be the compass, your spirit the light, and your practice the path. Together, they lead you to the serene shores of inner peace and boundless love.\n\nRemember, you are not just a wave in the ocean; you are the ocean in a wave, connected to all, infinite and whole. Trust the journey, for it is in the journey that the soul finds its purpose and the mind its tranquility."'
+        )}
       </p>
     </td>
   </tr>
@@ -337,7 +338,7 @@ function pageTwo(s: SectionMap): string {
 }
 
 function pageThree(s: SectionMap): string {
-  const partnerIconUrl = s["p3-partner-icon"]?.imageUrl;
+  const partnerIconUrl = s["p3-partner"]?.imageUrl;
   const partnerIcon = partnerIconUrl
     ? `<td align="center" valign="middle" bgcolor="#1c2431" height="400" style="background-color:#1c2431;border-radius:16px;">
           <img src="${escapeAttr(partnerIconUrl)}" width="200" alt="" style="display:block;width:200px;height:auto;border-radius:16px;">
@@ -348,15 +349,15 @@ function pageThree(s: SectionMap): string {
           </tr></table>
         </td>`;
 
-  const eventRow = (id: string, day: string, dow: string, title: string, sub: string) => `<a href="${link(id, s)}" style="display:block;text-decoration:none;color:inherit;">
+  const eventRow = (id: string, defaults: { day: string; dow: string; title: string; sub: string }) => `<a href="${link(id, s)}" style="display:block;text-decoration:none;color:inherit;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
         <td width="54" valign="top" align="center" style="padding:20px 0;">
-          <div class="ev-day">${day}</div>
-          <div class="ev-dow">${dow}</div>
+          <div class="ev-day">${text(id, "day", s, defaults.day)}</div>
+          <div class="ev-dow">${text(id, "dow", s, defaults.dow)}</div>
         </td>
         <td valign="top" style="padding:20px 0 20px 18px;">
-          <div class="ev-title">${title}</div>
-          <div class="ev-sub">${sub}</div>
+          <div class="ev-title">${text(id, "title", s, defaults.title)}</div>
+          <div class="ev-sub">${text(id, "sub", s, defaults.sub)}</div>
         </td>
       </tr></table>
     </a>`;
@@ -366,7 +367,7 @@ function pageThree(s: SectionMap): string {
   <tr>
     <td style="padding:26px 30px 40px;">
 
-      <img src="${img("p3-logo", s)}" width="246" alt="Holisteek" style="display:block;width:246px;height:auto;margin-bottom:16px;">
+      <img src="${escapeAttr(LOGO_URL)}" width="246" alt="Holisteek" style="display:block;width:246px;height:auto;margin-bottom:16px;">
 
       <div style="font-family:'Poppins',Arial,sans-serif;font-weight:600;font-size:13px;letter-spacing:3px;color:#1c2431;margin-bottom:14px;">PARTNER SPOTLIGHT</div>
 
@@ -374,27 +375,27 @@ function pageThree(s: SectionMap): string {
         ${partnerIcon}
       </tr></table>
 
-      <div style="font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:34px;color:#2f5099;margin-bottom:16px;">Nômade Temple, Madrid</div>
-      <p style="margin:0 0 26px;max-width:520px;font-family:'Nunito Sans',Arial,sans-serif;font-style:italic;font-size:19px;line-height:1.45;color:#333333;">"Most people come for the sound bath and stay for the community that forms after it."</p>
+      <div style="font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:34px;color:#2f5099;margin-bottom:16px;">${text("p3-partner", "title", s, "Nômade Temple, Madrid")}</div>
+      <p style="margin:0 0 26px;max-width:520px;font-family:'Nunito Sans',Arial,sans-serif;font-style:italic;font-size:19px;line-height:1.45;color:#333333;">${text("p3-partner", "description", s, '"Most people come for the sound bath and stay for the community that forms after it."')}</p>
 
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:26px;"><tr>
         <td class="stack" width="33.33%" valign="top">
           <div class="meta-k">BEST FOR</div>
-          <div class="meta-v">Sound healing</div>
+          <div class="meta-v">${text("p3-partner", "bestFor", s, "Sound healing")}</div>
         </td>
         <td class="stack" width="33.33%" valign="top">
           <div class="meta-k">LOCATION</div>
-          <div class="meta-v">Madrid Spain</div>
+          <div class="meta-v">${text("p3-partner", "location", s, "Madrid Spain")}</div>
         </td>
         <td class="stack" width="33.33%" valign="top">
           <div class="meta-k">WHAT?</div>
-          <div class="meta-v">Wellness Resort</div>
+          <div class="meta-v">${text("p3-partner", "category", s, "Wellness Resort")}</div>
         </td>
       </tr></table>
 
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;"><tr>
         <td bgcolor="#1c2431" style="background-color:#1c2431;border-radius:40px;">
-          <a href="${link("p3-partner-explore", s)}" style="display:block;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:19px;padding:18px;">Explore</a>
+          <a href="${link("p3-partner", s)}" style="display:block;text-align:center;color:#ffffff;text-decoration:none;font-family:'Poppins',Arial,sans-serif;font-weight:700;font-size:19px;padding:18px;">Explore</a>
         </td>
       </tr></table>
 
@@ -403,15 +404,15 @@ function pageThree(s: SectionMap): string {
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="divider">&nbsp;</td></tr>
       </table>
-      ${eventRow("p3-event-1", "28", "MON", "Sunrise breathwork", "Retiro Verde · 7:00 AM · 4 spots left")}
+      ${eventRow("p3-event-1", { day: "28", dow: "MON", title: "Sunrise breathwork", sub: "Retiro Verde · 7:00 AM · 4 spots left" })}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="divider">&nbsp;</td></tr>
       </table>
-      ${eventRow("p3-event-2", "30", "WED", "Sound bath under the stars", "Nômade Temple · 8:30 PM · waitlist open")}
+      ${eventRow("p3-event-2", { day: "30", dow: "WED", title: "Sound bath under the stars", sub: "Nômade Temple · 8:30 PM · waitlist open" })}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="divider">&nbsp;</td></tr>
       </table>
-      ${eventRow("p3-event-3", "02", "SAT", "Reformer + cacao morning", "Studio Alma · 9:00 AM · 6 spots left")}
+      ${eventRow("p3-event-3", { day: "02", dow: "SAT", title: "Reformer + cacao morning", sub: "Studio Alma · 9:00 AM · 6 spots left" })}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="divider">&nbsp;</td></tr>
       </table>

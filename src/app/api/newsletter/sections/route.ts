@@ -1,45 +1,41 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, NEWSLETTER_TABLE } from "@/lib/supabaseAdmin";
-import { SECTION_DEFS, SectionDef } from "@/lib/newsletter/sections";
+import { SECTION_DEFS, SectionDef, TEXT_FIELD_COLUMNS, TEXT_FIELD_KEYS, TextFieldKey } from "@/lib/newsletter/sections";
 import { errorMessage } from "@/lib/errorMessage";
 
-interface SectionRow {
+type SectionRow = {
   id: string;
   image_url: string | null;
   link_url: string | null;
-  title: string | null;
-  description: string | null;
   updated_at?: string;
-}
+} & Record<string, string | null | undefined>;
 
-export interface SectionApiItem extends SectionDef {
+export type SectionApiItem = SectionDef & {
   imageUrl: string;
   linkUrl: string;
-  title?: string;
-  description?: string;
-}
+} & Partial<Record<TextFieldKey, string>>;
 
-function textFieldDefault(def: SectionDef, key: "title" | "description"): string | undefined {
+function textFieldDefault(def: SectionDef, key: TextFieldKey): string | undefined {
   return def.textFields?.find((f) => f.key === key)?.defaultValue;
 }
 
-// Lista todas las secciones (metadata + valor actual) para el panel de admin.
+const SELECT_COLUMNS = ["id", "image_url", "link_url", "updated_at", ...Object.values(TEXT_FIELD_COLUMNS)].join(", ");
+
+// Lista todas las secciones (metadata + valor actual) para la página principal.
 export async function GET() {
   let rows: SectionRow[] = [];
 
   try {
     const supabase = getSupabaseAdmin();
-    const { data, error } = await supabase
-      .from(NEWSLETTER_TABLE)
-      .select("id, image_url, link_url, title, description, updated_at");
+    const { data, error } = await supabase.from(NEWSLETTER_TABLE).select(SELECT_COLUMNS);
 
     if (error) throw error;
-    rows = (data ?? []) as SectionRow[];
+    rows = (data ?? []) as unknown as SectionRow[];
   } catch (err) {
     return NextResponse.json(
       {
         error:
-          "No se pudo conectar con Supabase. Revisa SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local, y que hayas ejecutado supabase/newsletter_sections.sql.",
+          "No se pudo conectar con Supabase. Revisa SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local, y que hayas ejecutado los scripts en supabase/.",
         detail: errorMessage(err),
       },
       { status: 500 }
@@ -56,11 +52,10 @@ export async function GET() {
       linkUrl: row?.link_url || def.defaultLinkUrl || "#",
     };
 
-    if (def.textFields?.some((f) => f.key === "title")) {
-      item.title = row?.title || textFieldDefault(def, "title") || "";
-    }
-    if (def.textFields?.some((f) => f.key === "description")) {
-      item.description = row?.description || textFieldDefault(def, "description") || "";
+    for (const key of TEXT_FIELD_KEYS) {
+      if (def.textFields?.some((f) => f.key === key)) {
+        item[key] = row?.[TEXT_FIELD_COLUMNS[key]] || textFieldDefault(def, key) || "";
+      }
     }
 
     return item;

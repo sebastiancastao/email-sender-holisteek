@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, NEWSLETTER_BUCKET, NEWSLETTER_TABLE } from "@/lib/supabaseAdmin";
-import { sectionDef } from "@/lib/newsletter/sections";
+import { sectionDef, TEXT_FIELD_COLUMNS, TEXT_FIELD_KEYS } from "@/lib/newsletter/sections";
 import { errorMessage } from "@/lib/errorMessage";
 
 function extensionFor(file: File): string {
@@ -10,14 +10,14 @@ function extensionFor(file: File): string {
   return fromType || "bin";
 }
 
+const SELECT_COLUMNS = ["id", "image_url", "link_url", ...Object.values(TEXT_FIELD_COLUMNS)].join(", ");
+
 // Actualiza la imagen, la URL y/o el texto de una sección concreta del newsletter.
 // Espera multipart/form-data con:
-//  - image: archivo opcional (se sube a Supabase Storage como imagen nueva)
-//  - imageUrl: string opcional (asigna una imagen ya subida a la biblioteca,
-//    en vez de subir un archivo nuevo — tiene prioridad "image" si vienen ambos)
+//  - image: archivo opcional (se sube a Supabase Storage)
 //  - linkUrl: string opcional (URL de destino del botón/enlace)
-//  - title / description: string opcional (solo para secciones que definen
-//    esos campos de texto, p. ej. "Asana" en la página 1)
+//  - title / description / bestFor / location / category: string opcional
+//    (solo para secciones que definen esos campos de texto)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -45,15 +45,15 @@ export async function PATCH(
 
   const formData = await request.formData();
   const file = formData.get("image");
-  const imageUrlRaw = formData.get("imageUrl");
   const linkUrlRaw = formData.get("linkUrl");
-  const titleRaw = formData.get("title");
-  const descriptionRaw = formData.get("description");
 
-  const update: { image_url?: string; link_url?: string; title?: string; description?: string } = {};
+  const update: Record<string, string> = {};
+
+  const allowsImage = def.kind === "image" || def.kind === "image+link";
+  const allowsLink = def.kind === "link" || def.kind === "image+link";
 
   if (file instanceof File && file.size > 0) {
-    if (def.kind === "link") {
+    if (!allowsImage) {
       return NextResponse.json(
         { error: `La sección "${def.label}" no admite imagen.` },
         { status: 400 }
@@ -82,18 +82,10 @@ export async function PATCH(
       .getPublicUrl(path);
 
     update.image_url = publicUrlData.publicUrl;
-  } else if (typeof imageUrlRaw === "string" && imageUrlRaw.trim() !== "") {
-    if (def.kind === "link") {
-      return NextResponse.json(
-        { error: `La sección "${def.label}" no admite imagen.` },
-        { status: 400 }
-      );
-    }
-    update.image_url = imageUrlRaw.trim();
   }
 
   if (typeof linkUrlRaw === "string" && linkUrlRaw.trim() !== "") {
-    if (def.kind === "image") {
+    if (!allowsLink) {
       return NextResponse.json(
         { error: `La sección "${def.label}" no admite URL.` },
         { status: 400 }
@@ -102,24 +94,17 @@ export async function PATCH(
     update.link_url = linkUrlRaw.trim();
   }
 
-  if (typeof titleRaw === "string" && titleRaw.trim() !== "") {
-    if (!def.textFields?.some((f) => f.key === "title")) {
-      return NextResponse.json(
-        { error: `La sección "${def.label}" no admite título.` },
-        { status: 400 }
-      );
-    }
-    update.title = titleRaw.trim();
-  }
+  for (const key of TEXT_FIELD_KEYS) {
+    const raw = formData.get(key);
+    if (typeof raw !== "string" || raw.trim() === "") continue;
 
-  if (typeof descriptionRaw === "string" && descriptionRaw.trim() !== "") {
-    if (!def.textFields?.some((f) => f.key === "description")) {
+    if (!def.textFields?.some((f) => f.key === key)) {
       return NextResponse.json(
-        { error: `La sección "${def.label}" no admite descripción.` },
+        { error: `La sección "${def.label}" no admite el campo "${key}".` },
         { status: 400 }
       );
     }
-    update.description = descriptionRaw.trim();
+    update[TEXT_FIELD_COLUMNS[key]] = raw.trim();
   }
 
   if (Object.keys(update).length === 0) {
@@ -135,7 +120,7 @@ export async function PATCH(
       { id, page: def.page, label: def.label, ...update, updated_at: new Date().toISOString() },
       { onConflict: "id" }
     )
-    .select("id, image_url, link_url, title, description")
+    .select(SELECT_COLUMNS)
     .single();
 
   if (error) {

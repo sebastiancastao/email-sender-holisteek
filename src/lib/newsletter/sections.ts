@@ -1,13 +1,35 @@
 // Catálogo de "secciones" editables del newsletter Holisteek.
-// Cada sección tiene, como máximo, una imagen y una URL (link) que se pueden
-// sobrescribir desde el panel de administración (/admin/holisteek), y que se
-// guardan en la tabla `newsletter_sections` de Supabase.
+// Cada sección tiene, como máximo, una imagen, una URL (link) y algunos
+// campos de texto que se pueden sobrescribir desde la página principal, y
+// que se guardan en la tabla `newsletter_sections` de Supabase.
 
 export type PageNumber = 1 | 2 | 3;
 
-export type SectionKind = "image" | "link" | "image+link";
+export type SectionKind = "image" | "link" | "image+link" | "text";
 
-export type TextFieldKey = "title" | "description";
+export type TextFieldKey =
+  | "title"
+  | "description"
+  | "bestFor"
+  | "location"
+  | "category"
+  | "day"
+  | "dow"
+  | "sub";
+
+// Nombre de columna en `newsletter_sections` para cada campo de texto.
+export const TEXT_FIELD_COLUMNS: Record<TextFieldKey, string> = {
+  title: "title",
+  description: "description",
+  bestFor: "best_for",
+  location: "location",
+  category: "category",
+  day: "day",
+  dow: "dow",
+  sub: "sub",
+};
+
+export const TEXT_FIELD_KEYS = Object.keys(TEXT_FIELD_COLUMNS) as TextFieldKey[];
 
 export interface TextFieldDef {
   key: TextFieldKey;
@@ -24,6 +46,11 @@ export interface SectionDef {
   defaultImageUrl?: string;
   defaultLinkUrl?: string;
   textFields?: TextFieldDef[];
+  // Si está presente, la sección muestra un campo para pegar una URL de
+  // holisteek.com y autocompletar sus datos desde ahí:
+  //  - "place"  -> holisteek.com/places/...      (/api/newsletter/places/autofill)
+  //  - "event"  -> holisteek.com/experiences/...  (/api/newsletter/events/autofill)
+  autofillFrom?: "place" | "event";
 }
 
 // Bucket original donde vivían las imágenes de ejemplo. Se usa solo como
@@ -31,15 +58,11 @@ export interface SectionDef {
 const OLD_BUCKET =
   "https://bwvnvzlmqqcdemkpecjw.supabase.co/storage/v1/object/public/holisteek";
 
+// El logo no es editable desde el panel: es fijo en la plantilla (template.ts).
+export const LOGO_URL = `${OLD_BUCKET}/logo.png`;
+
 export const SECTION_DEFS: SectionDef[] = [
   // ---------- Página 1 ----------
-  {
-    id: "p1-logo",
-    page: 1,
-    label: "Página 1 — Logo (cabecera)",
-    kind: "image",
-    defaultImageUrl: `${OLD_BUCKET}/logo.png`,
-  },
   {
     id: "p1-hero",
     page: 1,
@@ -55,6 +78,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/vitamins.png`,
     defaultLinkUrl: "#",
+    textFields: [{ key: "title", label: "Título", defaultValue: "Feeling sluggish?" }],
   },
   {
     id: "p1-product-2",
@@ -63,6 +87,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/ledmask.png`,
     defaultLinkUrl: "#",
+    textFields: [{ key: "title", label: "Título", defaultValue: "Want tigher skin?" }],
   },
   {
     id: "p1-product-3",
@@ -71,6 +96,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
+    textFields: [{ key: "title", label: "Título", defaultValue: "Switching to organic?" }],
   },
   {
     id: "p1-product-4",
@@ -79,6 +105,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
+    textFields: [{ key: "title", label: "Título", defaultValue: "Switching to organic?" }],
   },
   {
     id: "p1-asana",
@@ -101,11 +128,20 @@ export const SECTION_DEFS: SectionDef[] = [
 
   // ---------- Página 2 ----------
   {
-    id: "p2-logo",
+    id: "p2-get-inspired",
     page: 2,
-    label: "Página 2 — Logo (cabecera)",
-    kind: "image",
-    defaultImageUrl: `${OLD_BUCKET}/logo.png`,
+    label: "Página 2 — Get Inspired (título + texto)",
+    kind: "text",
+    textFields: [
+      { key: "title", label: "Título", defaultValue: "Get Inspired" },
+      {
+        key: "description",
+        label: "Texto",
+        multiline: true,
+        defaultValue:
+          '"Embrace the dance of life with grace, as each breath is a step towards your true self. In the stillness of the mind, the universe reveals its secrets, guiding you with the wisdom of the Yoga Sutras.\n\nLet your heart be the compass, your spirit the light, and your practice the path. Together, they lead you to the serene shores of inner peace and boundless love.\n\nRemember, you are not just a wave in the ocean; you are the ocean in a wave, connected to all, infinite and whole. Trust the journey, for it is in the journey that the soul finds its purpose and the mind its tranquility."',
+      },
+    ],
   },
   {
     id: "p2-article-1",
@@ -138,54 +174,70 @@ export const SECTION_DEFS: SectionDef[] = [
 
   // ---------- Página 3 ----------
   {
-    id: "p3-logo",
+    id: "p3-partner",
     page: 3,
-    label: "Página 3 — Logo (cabecera)",
-    kind: "image",
-    defaultImageUrl: `${OLD_BUCKET}/logo.png`,
-  },
-  {
-    id: "p3-partner-icon",
-    page: 3,
-    label: "Página 3 — Icono del partner destacado (opcional, si no se sube se muestra el ícono por defecto)",
-    kind: "image",
-  },
-  {
-    id: "p3-partner-explore",
-    page: 3,
-    label: 'Página 3 — Botón "Explore" del partner',
-    kind: "link",
+    label: "Página 3 — Partner destacado",
+    kind: "image+link",
     defaultLinkUrl: "#",
+    autofillFrom: "place",
+    textFields: [
+      { key: "title", label: "Nombre del lugar", defaultValue: "Nômade Temple, Madrid" },
+      {
+        key: "description",
+        label: "Descripción / cita",
+        multiline: true,
+        defaultValue: '"Most people come for the sound bath and stay for the community that forms after it."',
+      },
+      { key: "bestFor", label: "Best for", defaultValue: "Sound healing" },
+      { key: "location", label: "Ubicación", defaultValue: "Madrid Spain" },
+      { key: "category", label: "Categoría (What?)", defaultValue: "Wellness Resort" },
+    ],
   },
   {
     id: "p3-event-1",
     page: 3,
-    label: "Página 3 — Evento 1 (Sunrise breathwork)",
+    label: "Página 3 — Evento 1",
     kind: "link",
     defaultLinkUrl: "#",
+    autofillFrom: "event",
+    textFields: [
+      { key: "day", label: "Día (número)", defaultValue: "28" },
+      { key: "dow", label: "Día de la semana", defaultValue: "MON" },
+      { key: "title", label: "Nombre del evento", defaultValue: "Sunrise breathwork" },
+      { key: "sub", label: "Detalle (lugar · hora · cupos)", defaultValue: "Retiro Verde · 7:00 AM · 4 spots left" },
+    ],
   },
   {
     id: "p3-event-2",
     page: 3,
-    label: "Página 3 — Evento 2 (Sound bath under the stars)",
+    label: "Página 3 — Evento 2",
     kind: "link",
     defaultLinkUrl: "#",
+    autofillFrom: "event",
+    textFields: [
+      { key: "day", label: "Día (número)", defaultValue: "30" },
+      { key: "dow", label: "Día de la semana", defaultValue: "WED" },
+      { key: "title", label: "Nombre del evento", defaultValue: "Sound bath under the stars" },
+      { key: "sub", label: "Detalle (lugar · hora · cupos)", defaultValue: "Nômade Temple · 8:30 PM · waitlist open" },
+    ],
   },
   {
     id: "p3-event-3",
     page: 3,
-    label: "Página 3 — Evento 3 (Reformer + cacao morning)",
+    label: "Página 3 — Evento 3",
     kind: "link",
     defaultLinkUrl: "#",
+    autofillFrom: "event",
+    textFields: [
+      { key: "day", label: "Día (número)", defaultValue: "02" },
+      { key: "dow", label: "Día de la semana", defaultValue: "SAT" },
+      { key: "title", label: "Nombre del evento", defaultValue: "Reformer + cacao morning" },
+      { key: "sub", label: "Detalle (lugar · hora · cupos)", defaultValue: "Studio Alma · 9:00 AM · 6 spots left" },
+    ],
   },
 ];
 
-export type SectionValue = {
-  imageUrl: string;
-  linkUrl: string;
-  title: string;
-  description: string;
-};
+export type SectionValue = { imageUrl: string; linkUrl: string } & Record<TextFieldKey, string>;
 export type SectionMap = Record<string, SectionValue>;
 
 function textFieldDefault(def: SectionDef, key: TextFieldKey): string {
@@ -195,12 +247,14 @@ function textFieldDefault(def: SectionDef, key: TextFieldKey): string {
 export function defaultSectionMap(): SectionMap {
   const map: SectionMap = {};
   for (const def of SECTION_DEFS) {
-    map[def.id] = {
+    const value = {
       imageUrl: def.defaultImageUrl ?? "",
       linkUrl: def.defaultLinkUrl ?? "#",
-      title: textFieldDefault(def, "title"),
-      description: textFieldDefault(def, "description"),
-    };
+    } as SectionValue;
+    for (const key of TEXT_FIELD_KEYS) {
+      value[key] = textFieldDefault(def, key);
+    }
+    map[def.id] = value;
   }
   return map;
 }
