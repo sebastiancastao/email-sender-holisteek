@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { SectionDef, TEXT_FIELD_COLUMNS, TEXT_FIELD_KEYS, TextFieldKey } from "@/lib/newsletter/sections";
 
 // ============================================================================
@@ -40,7 +40,7 @@ function pageDisplayName(page: number | "all") {
 }
 
 const AUTOFILL_CONFIG: Record<
-  "place" | "event" | "article",
+  "place" | "event" | "article" | "amazon",
   {
     endpoint: string;
     placeholder: string;
@@ -67,13 +67,25 @@ const AUTOFILL_CONFIG: Record<
     helpText: "Trae imagen, título y descripción automáticamente.",
     buildBody: (sectionId, url) => ({ sectionId, url }),
   },
+  amazon: {
+    endpoint: "/api/newsletter/amazon/autofill",
+    placeholder: "https://www.amazon.com/dp/...",
+    helpText:
+      'Trae imagen, nombre del producto y bullets automáticamente, acortados por IA a algo comercial. El "Título" (frase gancho) se escribe a mano.',
+    buildBody: (sectionId, url) => ({ sectionId, url }),
+  },
 };
 
-const AUTOFILL_SOURCE_LABEL: Record<"place" | "event" | "article", string> = {
+const AUTOFILL_SOURCE_LABEL: Record<"place" | "event" | "article" | "amazon", string> = {
   place: "holisteek.com/places",
   event: "holisteek.com/experiences",
   article: "holisteek.com/guide",
+  amazon: "amazon.com",
 };
+
+// Campos de datos estructurados (no copy de marketing): no tiene sentido
+// que la IA los "redacte", así que no muestran el botón "✨ IA".
+const AI_ASSIST_EXCLUDED_KEYS = new Set<TextFieldKey>(["location", "category", "day", "dow", "sub"]);
 
 // A partir de una fila de `newsletter_sections` (image_url, link_url, title,
 // description, best_for, location, category) arma el Partial<Section> que
@@ -238,6 +250,13 @@ function SectionRow({
   const [autofillStatus, setAutofillStatus] = useState<RowStatus>("idle");
   const [autofillError, setAutofillError] = useState("");
 
+  const fieldRefs = useRef<Partial<Record<TextFieldKey, HTMLInputElement | HTMLTextAreaElement | null>>>({});
+  const [aiField, setAiField] = useState<TextFieldKey | null>(null);
+  const [aiError, setAiError] = useState("");
+
+  const [bgImageStatus, setBgImageStatus] = useState<RowStatus>("idle");
+  const [bgImageError, setBgImageError] = useState("");
+
   const hasImage = section.kind === "image" || section.kind === "image+link";
   const hasLink = section.kind === "link" || section.kind === "image+link";
 
@@ -309,6 +328,64 @@ function SectionRow({
     }
   }
 
+  async function handleGenerateText(fieldKey: TextFieldKey) {
+    setAiField(fieldKey);
+    setAiError("");
+
+    try {
+      const res = await fetch("/api/newsletter/ai/generate-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sectionId: section.id, field: fieldKey }),
+      });
+
+      const body = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(body.error ?? "No se pudo generar el texto");
+      }
+
+      const el = fieldRefs.current[fieldKey];
+      if (el) el.value = body.text;
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Algo salió mal");
+    } finally {
+      setAiField(null);
+    }
+  }
+
+  async function handleGenerateBackground() {
+    const word = (fieldRefs.current.title?.value ?? section.title ?? "").trim();
+    if (!word) {
+      setBgImageStatus("error");
+      setBgImageError('Escribe primero una palabra en "Título".');
+      return;
+    }
+
+    setBgImageStatus("saving");
+    setBgImageError("");
+
+    try {
+      const res = await fetch("/api/newsletter/asana/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word }),
+      });
+
+      const body = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(body.error ?? "No se pudo generar la imagen");
+      }
+
+      onSaved(sectionUpdateFromRow(body.section, section));
+      setBgImageStatus("saved");
+    } catch (err) {
+      setBgImageStatus("error");
+      setBgImageError(err instanceof Error ? err.message : "Algo salió mal");
+    }
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -375,16 +452,53 @@ function SectionRow({
           </div>
         )}
 
+        {section.aiBackgroundImage && (
+          <div className="mt-2 flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={handleGenerateBackground}
+              disabled={bgImageStatus === "saving"}
+              className="w-fit rounded-full border border-black/[.2] px-4 py-1.5 text-xs font-medium text-black transition-colors hover:bg-black/[.05] disabled:opacity-50 dark:border-white/[.3] dark:text-zinc-50 dark:hover:bg-white/[.08]"
+            >
+              {bgImageStatus === "saving" ? "Generando imagen..." : "✨ Generar imagen con IA"}
+            </button>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Genera el fondo repitiendo la palabra que esté ahora mismo en &quot;Título&quot; abajo.
+            </p>
+            {bgImageStatus === "error" && (
+              <p className="text-xs text-red-600 dark:text-red-400">{bgImageError}</p>
+            )}
+            {bgImageStatus === "saved" && (
+              <p className="text-xs text-green-600 dark:text-green-400">Imagen generada y guardada.</p>
+            )}
+          </div>
+        )}
+
         {/* key remonta estos campos cuando "Autocompletar" cambia varios a la vez,
             porque son inputs no controlados (defaultValue). */}
         <div key={fieldsNonce} style={{ display: "contents" }}>
           {(section.textFields ?? []).map((field) => (
             <div key={field.key} className="mt-2 flex flex-col gap-1">
-              <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                {field.label}
-              </label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  {field.label}
+                </label>
+                {!AI_ASSIST_EXCLUDED_KEYS.has(field.key) && (
+                  <button
+                    type="button"
+                    onClick={() => handleGenerateText(field.key)}
+                    disabled={aiField === field.key}
+                    className="shrink-0 text-[11px] font-medium text-purple-600 hover:underline disabled:opacity-50 dark:text-purple-400"
+                  >
+                    {aiField === field.key ? "Generando..." : "✨ IA"}
+                  </button>
+                )}
+              </div>
               {field.multiline ? (
                 <textarea
+                  ref={(el) => {
+                    fieldRefs.current[field.key] = el;
+                  }}
                   name={field.key}
                   rows={3}
                   defaultValue={section[field.key]}
@@ -392,6 +506,9 @@ function SectionRow({
                 />
               ) : (
                 <input
+                  ref={(el) => {
+                    fieldRefs.current[field.key] = el;
+                  }}
                   type="text"
                   name={field.key}
                   defaultValue={section[field.key]}
@@ -400,6 +517,7 @@ function SectionRow({
               )}
             </div>
           ))}
+          {aiError && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{aiError}</p>}
 
           {hasLink && (
             <div className="mt-2 flex flex-col gap-1">

@@ -56,12 +56,17 @@ export interface SectionDef {
   defaultImageUrl?: string;
   defaultLinkUrl?: string;
   textFields?: TextFieldDef[];
-  // Si está presente, la sección muestra un campo para pegar una URL de
-  // holisteek.com y autocompletar sus datos desde ahí:
+  // Si está presente, la sección muestra un campo para pegar una URL y
+  // autocompletar sus datos desde ahí:
   //  - "place"   -> holisteek.com/places/...      (/api/newsletter/places/autofill)
   //  - "event"   -> holisteek.com/experiences/...  (/api/newsletter/events/autofill)
   //  - "article" -> holisteek.com/guide/...        (/api/newsletter/articles/autofill)
-  autofillFrom?: "place" | "event" | "article";
+  //  - "amazon"  -> amazon.<tld>/...                (/api/newsletter/amazon/autofill)
+  autofillFrom?: "place" | "event" | "article" | "amazon";
+  // Si es true, la sección muestra un botón para generar su imagen con
+  // OpenAI, repitiendo el valor actual del campo "title" como patrón de
+  // fondo (ver /api/newsletter/asana/generate-image).
+  aiBackgroundImage?: boolean;
 }
 
 // Bucket original donde vivían las imágenes de ejemplo. Se usa solo como
@@ -101,6 +106,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/vitamins.png`,
     defaultLinkUrl: "#",
+    autofillFrom: "amazon",
     textFields: [
       { key: "title", label: "Título", defaultValue: "Feeling sluggish?" },
       { key: "subtitle", label: "Nombre del producto", defaultValue: "Dr Vit - Vit C" },
@@ -117,6 +123,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/ledmask.png`,
     defaultLinkUrl: "#",
+    autofillFrom: "amazon",
     textFields: [
       { key: "title", label: "Título", defaultValue: "Want tigher skin?" },
       { key: "subtitle", label: "Nombre del producto", defaultValue: "LED Mask by Pop" },
@@ -133,6 +140,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
+    autofillFrom: "amazon",
     textFields: [
       { key: "title", label: "Título", defaultValue: "Switching to organic?" },
       { key: "subtitle", label: "Nombre del producto", defaultValue: "Try Organic MATTY" },
@@ -149,6 +157,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/mat.png`,
     defaultLinkUrl: "#",
+    autofillFrom: "amazon",
     textFields: [
       { key: "title", label: "Título", defaultValue: "Switching to organic?" },
       { key: "subtitle", label: "Nombre del producto", defaultValue: "Try Organic MATTY" },
@@ -165,6 +174,7 @@ export const SECTION_DEFS: SectionDef[] = [
     kind: "image+link",
     defaultImageUrl: `${OLD_BUCKET}/asana-watermark.png`,
     defaultLinkUrl: "#",
+    aiBackgroundImage: true,
     textFields: [
       { key: "title", label: "Título", defaultValue: "ASANA" },
       {

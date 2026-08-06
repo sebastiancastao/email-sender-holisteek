@@ -2,30 +2,11 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin, NEWSLETTER_TABLE } from "@/lib/supabaseAdmin";
 import { sectionDef, TEXT_FIELD_COLUMNS } from "@/lib/newsletter/sections";
 import { errorMessage } from "@/lib/errorMessage";
+import { decodeHtmlEntities } from "@/lib/htmlEntities";
 
 const ALLOWED_HOSTS = new Set(["holisteek.com", "www.holisteek.com"]);
 const ALLOWED_PATH_PREFIX = "/guide/";
 const SELECT_COLUMNS = ["id", "image_url", "link_url", ...Object.values(TEXT_FIELD_COLUMNS)].join(", ");
-
-const HTML_ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  "#x27": "'",
-  "#39": "'",
-};
-
-function decodeHtmlEntities(value: string): string {
-  return value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity) => {
-    const key = entity.toLowerCase();
-    if (key in HTML_ENTITIES) return HTML_ENTITIES[key];
-    if (key.startsWith("#x")) return String.fromCodePoint(parseInt(key.slice(2), 16));
-    if (key.startsWith("#")) return String.fromCodePoint(parseInt(key.slice(1), 10));
-    return match;
-  });
-}
 
 function metaContent(html: string, property: string): string | undefined {
   const match = html.match(
